@@ -9,11 +9,12 @@ defmodule Demo.Part2.ChatRoomV2 do
 
   # API
 
-  def start_link(args) do
-    case args[:room_name] do
-      nil -> {:error, {:missing_arg, :room_name}}
-      room_name -> GenServer.start_link(@me, args, name: via_tuple(room_name))
-    end
+  def start_link(nil) do
+    {:error, {:missing_arg, :room_name}}
+  end
+
+  def start_link(room_name) do
+    GenServer.start_link(@me, room_name, name: via_tuple(room_name))
   end
 
   def send_msg(room_name, msg) do
@@ -27,13 +28,13 @@ defmodule Demo.Part2.ChatRoomV2 do
   # CALLBACKS
 
   @impl true
-  def init(args), do: {:ok, %@me{chat_room: args[:room_name]}}
+  def init(room_name), do: {:ok, %@me{chat_room: room_name}}
 
   @impl true
   def handle_call({:participate, pid}, _, %@me{participants: ps} = state) do
     readable_name = retrieve_sender_name(pid)
 
-    with {:registered?, name} when not is_nil(name) <- {:registered?, readable_name},
+    with {:registered?, name} when not is_nil(name) <- {:registered?, readable_name}, # Elixir with statement: https://elixirschool.com/en/lessons/basics/control_structures#with-3
          {:participating?, false} <- {:participating?, name in ps} do
       new_state = %{state | participants: [name | state.participants]}
       {:reply, :ok, new_state}

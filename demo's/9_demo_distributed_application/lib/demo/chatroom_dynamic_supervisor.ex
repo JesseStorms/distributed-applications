@@ -1,4 +1,4 @@
-defmodule Demo.Part2.ChatroomsDynamicSupervisor do
+defmodule Demo.ChatroomDynamicSupervisor do
   # Automatically defines child_spec/1
   use DynamicSupervisor
 
@@ -12,6 +12,6 @@ defmodule Demo.Part2.ChatroomsDynamicSupervisor do
   end
 
   def start_chatroom(room_name) do
-    DynamicSupervisor.start_child(__MODULE__, {Demo.Part2.ChatRoomV2, room_name})
+    DynamicSupervisor.start_child(__MODULE__, {Demo.Chatroom, room_name})
   end
 end
